@@ -1,127 +1,128 @@
-import { motion } from 'framer-motion'
-import { ArrowDown } from 'lucide-react'
-import { Link } from 'react-router-dom'
-import ParticleField from '../../animations/ParticleField'
+import { useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { ArrowDown, ArrowUpRight } from 'lucide-react';
 
 export default function Hero() {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animId;
+    let t = 0;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      t += 0.003;
+
+      const orbs = [
+        { x: canvas.width * 0.15, y: canvas.height * 0.4, r: canvas.width * 0.4, color: 'rgba(7,13,26,0.6)' },
+        { x: canvas.width * (0.7 + Math.sin(t * 0.5) * 0.05), y: canvas.height * (0.3 + Math.cos(t * 0.3) * 0.05), r: canvas.width * 0.3, color: 'rgba(10,15,30,0.5)' },
+        { x: canvas.width * (0.5 + Math.cos(t * 0.4) * 0.08), y: canvas.height * (0.8 + Math.sin(t * 0.6) * 0.04), r: canvas.width * 0.25, color: 'rgba(201,169,110,0.04)' },
+      ];
+
+      orbs.forEach(orb => {
+        const g = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.r);
+        g.addColorStop(0, orb.color);
+        g.addColorStop(1, 'transparent');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      });
+
+      const streakY = canvas.height * 0.5;
+      const streakG = ctx.createLinearGradient(0, streakY - 1, canvas.width, streakY + 1);
+      streakG.addColorStop(0, 'transparent');
+      streakG.addColorStop(0.3, 'rgba(200,184,154,0.03)');
+      streakG.addColorStop(0.5, `rgba(200,184,154,${0.04 + Math.sin(t) * 0.02})`);
+      streakG.addColorStop(0.7, 'rgba(200,184,154,0.03)');
+      streakG.addColorStop(1, 'transparent');
+      ctx.fillStyle = streakG;
+      ctx.fillRect(0, streakY - 80, canvas.width, 160);
+
+      animId = requestAnimationFrame(draw);
+    };
+    draw();
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('resize', resize);
+    };
+  }, []);
+
+  const container = { hidden: {}, show: { transition: { staggerChildren: 0.12, delayChildren: 0.6 } } };
+  const item = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] } } };
+
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-void noise-overlay">
-      {/* Particles */}
-      <ParticleField count={40} opacity={0.5} />
+    <section id="hero" className="relative min-h-screen flex flex-col justify-center overflow-hidden hero-bg">
+      {/* Canvas atmosphere */}
+      <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" style={{mixBlendMode:'screen'}} />
 
-      {/* Background gradient */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px]"
-          style={{ background: 'radial-gradient(ellipse, rgba(10,22,40,0.8) 0%, rgba(37,99,235,0.06) 40%, transparent 70%)' }} />
-        <div className="absolute top-0 right-0 w-[500px] h-[500px]"
-          style={{ background: 'radial-gradient(circle, rgba(37,99,235,0.04) 0%, transparent 70%)' }} />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px]"
-          style={{ background: 'radial-gradient(circle, rgba(201,169,110,0.03) 0%, transparent 70%)' }} />
-      </div>
+      {/* Centered hero content */}
+      <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 pt-32 pb-20 w-full">
+        <motion.div variants={container} initial="hidden" animate="show" className="flex flex-col items-center">
 
-      {/* Grid lines */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
-        style={{ backgroundImage: 'linear-gradient(rgba(147,197,253,1) 1px, transparent 1px), linear-gradient(90deg, rgba(147,197,253,1) 1px, transparent 1px)', backgroundSize: '80px 80px' }} />
+          {/* Top label */}
+          <motion.div variants={item} className="flex items-center gap-4 mb-16">
+            <div className="w-8 h-px bg-beige" />
+            <span className="label-text">Luxury Digital Studio — Est. 2022</span>
+            <div className="w-8 h-px bg-beige" />
+          </motion.div>
 
-      {/* Main content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 text-center">
-        {/* Eyebrow */}
-        <motion.div
-          className="flex items-center justify-center gap-3 mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
-        >
-          <span className="line-accent" />
-          <span className="font-mono text-xs tracking-megawide uppercase text-electric-blue/60">
-            Luxury Digital Agency
-          </span>
-          <span className="line-accent rotate-180" />
-        </motion.div>
+          {/* Main headline */}
+          <motion.div variants={item} className="mb-8">
+            <h1 className="display-text text-white" style={{fontSize:'clamp(3.5rem, 10vw, 9rem)'}}>
+              Websites that<br />
+              <span className="italic text-beige">command</span><br />
+              premium.
+            </h1>
+          </motion.div>
 
-        {/* Headline */}
-        <div className="overflow-hidden mb-6">
-          <motion.h1
-            className="font-display text-[clamp(3.5rem,9vw,9rem)] font-light leading-[0.9] tracking-tight text-silk"
-            initial={{ y: 120, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.6, duration: 1, ease: [0.76, 0, 0.24, 1] }}
-          >
-            Where Vision
-          </motion.h1>
-        </div>
-        <div className="overflow-hidden mb-6">
-          <motion.h1
-            className="font-display text-[clamp(3.5rem,9vw,9rem)] font-light leading-[0.9] tracking-tight italic"
-            initial={{ y: 120, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.75, duration: 1, ease: [0.76, 0, 0.24, 1] }}
-            style={{ color: 'transparent', WebkitTextStroke: '1px rgba(147,197,253,0.6)' }}
-          >
-            Ascends.
-          </motion.h1>
-        </div>
+          {/* Sub text */}
+          <motion.div variants={item} className="max-w-md mb-14">
+            <p className="text-white/50 text-sm leading-relaxed">
+              Custom-coded digital experiences for hotels, resorts, restaurants, architects, doctors, and luxury brands worldwide. Founded by Sejal Kanwar.
+            </p>
+          </motion.div>
 
-        {/* Subline */}
-        <motion.p
-          className="font-sans font-light text-silver/50 text-lg max-w-xl mx-auto mb-12 leading-relaxed"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1, duration: 0.9 }}
-        >
-          Cinematic, custom-coded websites for elite hotels, clinics, restaurants, and brands that refuse to be ordinary.
-        </motion.p>
+          {/* CTAs */}
+          <motion.div variants={item} className="flex flex-wrap items-center justify-center gap-6">
+            <Link to="/portfolio" className="cinematic-btn">
+              <span>View Our Work</span>
+              <ArrowUpRight size={14} />
+            </Link>
+            <Link to="/contact" className="flex items-center gap-3 text-white/40 hover:text-beige transition-colors duration-500 text-xs tracking-widest uppercase group">
+              <span>Start a Project</span>
+              <span className="w-6 h-px bg-white/20 group-hover:bg-beige group-hover:w-10 transition-all duration-500" />
+            </Link>
+          </motion.div>
 
-        {/* CTAs */}
-        <motion.div
-          className="flex flex-col sm:flex-row items-center justify-center gap-4"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2, duration: 0.9 }}
-        >
-          <Link to="/contact" className="btn-primary">
-            Begin Your Project
-          </Link>
-          <Link to="/portfolio" className="btn-outline">
-            View Portfolio
-          </Link>
-        </motion.div>
-
-        {/* Stats row */}
-        <motion.div
-          className="flex flex-wrap items-center justify-center gap-12 mt-20"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 1 }}
-        >
-          {[
-            { value: '50+', label: 'Projects' },
-            { value: '18+', label: 'Industries' },
-            { value: '100%', label: 'Satisfaction' },
-          ].map(stat => (
-            <div key={stat.label} className="flex flex-col items-center gap-1">
-              <span className="font-display text-3xl font-light text-gradient-blue">{stat.value}</span>
-              <span className="font-mono text-xs tracking-widest uppercase text-silver/30">{stat.label}</span>
-            </div>
-          ))}
+          {/* Scroll indicator */}
+          <motion.div variants={item} className="mt-24 flex flex-col items-center gap-3">
+            <motion.div
+              animate={{ y: [0, 6, 0] }}
+              transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+            >
+              <ArrowDown size={14} className="text-beige/40" />
+            </motion.div>
+            <span className="label-text text-white/20" style={{fontSize:'0.55rem',writingMode:'vertical-rl'}}>SCROLL</span>
+          </motion.div>
         </motion.div>
       </div>
 
-      {/* Scroll indicator */}
-      <motion.div
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2, duration: 1 }}
-      >
-        <span className="font-mono text-xs tracking-widest uppercase text-silver/25">Scroll</span>
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
-        >
-          <ArrowDown size={14} className="text-silver/25" />
-        </motion.div>
-      </motion.div>
+      {/* Right-side vertical text */}
+      <div className="hidden lg:flex absolute right-8 top-1/2 -translate-y-1/2 flex-col items-center gap-4">
+        <span className="label-text text-white/20" style={{writingMode:'vertical-rl',fontSize:'0.6rem',letterSpacing:'0.3em'}}>UPWARD DIGITAL 2025</span>
+        <div className="w-px h-16 bg-gradient-to-b from-transparent to-beige/20" />
+      </div>
     </section>
-  )
+  );
 }

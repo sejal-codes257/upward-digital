@@ -1,102 +1,50 @@
-import { useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import Layout from './components/layout/Layout';
+import Home from './pages/Home';
+import About from './pages/About';
+import Services from './pages/Services';
+import Portfolio from './pages/Portfolio';
+import CaseStudies from './pages/CaseStudies';
+import Testimonials from './pages/Testimonials';
+import Pricing from './pages/Pricing';
+import Blog from './pages/Blog';
+import Contact from './pages/Contact';
+import Admin from './pages/Admin';
+import NotFound from './pages/NotFound';
 
-import Navbar from './components/layout/Navbar'
-import Footer from './components/layout/Footer'
-import CustomCursor from './components/ui/CustomCursor'
-import Loader from './components/ui/Loader'
-import { useSmoothScroll } from './hooks/useSmoothScroll'
-
-import HomePage from './pages/HomePage'
-import AboutPage from './pages/AboutPage'
-import ServicesPage from './pages/ServicesPage'
-import PortfolioPage from './pages/PortfolioPage'
-import CaseStudiesPage from './pages/CaseStudiesPage'
-import TestimonialsPage from './pages/TestimonialsPage'
-import PricingPage from './pages/PricingPage'
-import BlogPage from './pages/BlogPage'
-import ContactPage from './pages/ContactPage'
-import InquiryPage from './pages/InquiryPage'
-import AdminDashboard from './pages/AdminDashboard'
-import NotFoundPage from './pages/NotFoundPage'
-
-// Page transition wrapper
-function PageWrapper({ children }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
-    >
-      {children}
-    </motion.div>
-  )
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
 }
 
-// Scroll to top on route change
-function ScrollReset() {
-  const location = useLocation()
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [location.pathname])
-  return null
-}
-
-// Layout wrapper (excludes admin and inquiry from standard layout)
-function SiteLayout({ children }) {
-  const location = useLocation()
-  const isAdmin = location.pathname.startsWith('/admin')
-  const isInquiry = location.pathname === '/inquiry'
-
-  if (isAdmin || isInquiry) {
-    return <>{children}</>
-  }
-
+function HomeWithLayout() {
   return (
-    <>
-      <Navbar />
-      <div className="pt-0">{children}</div>
-      <Footer />
-    </>
-  )
-}
-
-function AnimatedRoutes() {
-  const location = useLocation()
-
-  return (
-    <SiteLayout>
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<PageWrapper><HomePage /></PageWrapper>} />
-          <Route path="/about" element={<PageWrapper><AboutPage /></PageWrapper>} />
-          <Route path="/services" element={<PageWrapper><ServicesPage /></PageWrapper>} />
-          <Route path="/portfolio" element={<PageWrapper><PortfolioPage /></PageWrapper>} />
-          <Route path="/case-studies" element={<PageWrapper><CaseStudiesPage /></PageWrapper>} />
-          <Route path="/testimonials" element={<PageWrapper><TestimonialsPage /></PageWrapper>} />
-          <Route path="/pricing" element={<PageWrapper><PricingPage /></PageWrapper>} />
-          <Route path="/blog" element={<PageWrapper><BlogPage /></PageWrapper>} />
-          <Route path="/contact" element={<PageWrapper><ContactPage /></PageWrapper>} />
-          <Route path="/inquiry" element={<PageWrapper><InquiryPage /></PageWrapper>} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="*" element={<PageWrapper><NotFoundPage /></PageWrapper>} />
-        </Routes>
-      </AnimatePresence>
-    </SiteLayout>
-  )
+    <Layout>
+      <Home />
+    </Layout>
+  );
 }
 
 export default function App() {
-  const [loaded, setLoaded] = useState(false)
-  useSmoothScroll()
-
   return (
     <BrowserRouter>
-      <CustomCursor />
-      {!loaded && <Loader onComplete={() => setLoaded(true)} />}
-      <AnimatedRoutes />
+      <ScrollToTop />
+      <Routes>
+        <Route path="/" element={<HomeWithLayout />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/portfolio" element={<Portfolio />} />
+        <Route path="/case-studies" element={<CaseStudies />} />
+        <Route path="/testimonials" element={<Testimonials />} />
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </BrowserRouter>
-  )
+  );
 }

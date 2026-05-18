@@ -4,33 +4,36 @@ export default {
   theme: {
     extend: {
       colors: {
-        obsidian: '#080808',
-        void: '#050505',
-        ink: '#0f0f0f',
-        'deep-blue': '#0a1628',
-        'royal-blue': '#1a3a6b',
-        'electric-blue': '#2563eb',
-        'ice-blue': '#93c5fd',
-        'silk': '#f5f0e8',
-        'cream': '#faf7f2',
-        'warm-white': '#f0ebe0',
+        'deep-black': '#030303',
+        'dark-blue': '#070d1a',
+        'midnight': '#0a0f1e',
+        'charcoal': '#111111',
+        'beige': '#c8b89a',
+        'beige-light': '#ddd0bc',
+        'beige-dark': '#8a7a62',
+        'silver': '#a0a8b0',
         'gold': '#c9a96e',
-        'gold-light': '#e8d5a3',
-        'silver': '#a8b4c4',
-        'silver-light': '#d4dde8',
+        'gold-light': '#e2c99a',
+        cream: '#f5f0e8',
       },
       fontFamily: {
-        display: ['"Cormorant Garamond"', 'serif'],
-        sans: ['"DM Sans"', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'monospace'],
+        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        sans: ['"Neue Haas Grotesk"', '"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif'],
+        display: ['"Cormorant"', '"Cormorant Garamond"', 'Georgia', 'serif'],
       },
-      letterSpacing: {
-        'ultrawide': '0.3em',
-        'megawide': '0.5em',
+      animation: {
+        'marquee': 'marquee 30s linear infinite',
+        'float': 'float 6s ease-in-out infinite',
       },
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'noise': "url('/assets/noise.svg')",
+      keyframes: {
+        marquee: {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-20px)' },
+        },
       },
     },
   },
