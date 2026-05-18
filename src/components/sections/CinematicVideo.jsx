@@ -50,7 +50,7 @@ export default function CinematicVideo() {
           transition: 'opacity 1.2s ease',
         }}
       >
-        <source src="/assets/videos/hero-video.mp4" type="video/mp4" />
+        <source src="./assets/videos/hero-video.mp4" type="video/mp4" />
       </video>
 
       {/* Fallback dark atmosphere when no video */}
